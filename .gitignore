@@ -1,0 +1,16 @@
+# Logs
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Node environment (just in case someone adds node code later)
+node_modules/
+
+# API keys or credentials (NEVER push these)
+.env
+
+# Backup files
+*.bak
+*.tmp
