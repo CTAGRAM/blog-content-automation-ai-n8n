@@ -1,0 +1,1583 @@
+{
+  "name": "Wordpress Automate",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "2 1 * * 2"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        540,
+        160
+      ],
+      "id": "497266e5-8c40-4185-9995-cda077d69dac",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ToaO3eEW1lJLM5s5deiKKVWrjuHYuunUyji3YQOthIc",
+          "mode": "list",
+          "cachedResultName": "Cluster - Blog Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ToaO3eEW1lJLM5s5deiKKVWrjuHYuunUyji3YQOthIc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1714539459,
+          "mode": "list",
+          "cachedResultName": "Pillar #1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ToaO3eEW1lJLM5s5deiKKVWrjuHYuunUyji3YQOthIc/edit#gid=1714539459"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Completed",
+              "lookupValue": "No"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        760,
+        160
+      ],
+      "id": "42b55d32-113d-49e4-8f01-8f5323a52297",
+      "name": "Grab New Cluster",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hWyck1syXZrHxgFK",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world class blog posts. \n\nFor each new blog post project, you are provided with a list of keywords and search intent. \n\n- Keywords: The keywords are to what the blog post is meant to rank for. They are scattered throughout the blog and define the topic of the blog post. \n\n- Search intent: The search intent recognises the intent of the user when searching up the keyword which defines be the theme of the blog post, so they click on our blog to satisfy their search. \n\n- Primary keyword: Out of the keywords, there is one keyword known as the primary keyword. The primary keyword will go in the title and first few sentences. It is important that the topic of the blog post is related to the primary keyword so that you can place it into the title and introduction naturally. \n\n- Faq: The Faq (frequently asked questions) are for you to understand the user and public main focus. they are for the last part of the blog (always change the main company name which is present in faq to a general faq question so it doesnt have any guidlines problem )\n\nGiven a list of keywords and search intent, your job is to understand the goal of th e blog post, identify the thought process behind the flow of the blog post and come up with a preliminary plan for the post. \n\nYour output must: \n\n- Recognise the discussion points of the blog post.\n\n- Be in dot point format.\n\nYou must ensure that the plan created satisfies the search intent and revolves directly around the given keywords. \n\nWhen making the plan keep in mind that all keywords must be used in the final blog post. \n\nThe final goal of the project is to create a high quality, high value, highly relevant blog post that will satisfy the users search intent and give them everything they need to know about the topic. \n\nA new project just came across your desk with below keywords and search intent:\n\nKeywords: \n{{ $json.Keywords }}\n\nSearch intent: \n{{ $json.Intent }}\n\nPrimary keyword: \n{{ $json['Primary Keyword'] }}\n\nFaq:\n{{ $json.Faq }}\n\nCreate the preliminary plan."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        980,
+        160
+      ],
+      "id": "73fcca52-dcd4-4373-b22e-26992a8dd3df",
+      "name": "Preliminary Plan",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "23b8e8c4-9191-415a-9661-1b60d413528a",
+              "name": "research",
+              "value": "={{ $json.choices[0].message.content.replaceAll(\"[1]\", \" - source: \" +$json.citations[0]).replaceAll(\"[2]\",\" source:\" +$json.citations[1]).replaceAll(\"[3]\",\" - source: \" +$json.citations[2]).replaceAll(\"[4]\",\" - source: \"+$json.citations[3]).replaceAll(\"[5]\",\" - source: \"+$json.citations[4]).replaceAll(\"[6]\",\" - source: \"+$json.citations[5]).replaceAll(\"[7]\",\" - source: \"+$json.citations[6]).replaceAll(\"[8]\",\" - source: \"+$json.citations[7]).replaceAll(\"[9]\",\" - source: \"+$json.citations[8]).replaceAll(\"[10]\",\" - source: \"+$json.citations[9]) }}",
+              "type": "string"
+            },
+            {
+              "id": "b4e23084-89ef-437b-9bb7-26fcd854aeb0",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1580,
+        160
+      ],
+      "id": "6659c931-a1d9-4c7a-9414-783e568a9598",
+      "name": "Fix Links"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world class blog posts. \n\nFor each new blog post project, you are provided with a list of keywords, a primary keyword, search intent, research findings and a preliminary blog post plan. Here's a definition of each of the inputs: \n\n- Keywords: These are the keywordswhich the blog post is meant to rank for on SEO. They should be scattered throughout the blog post intelligently to help with SEO. \n\n- Search intent: The search intent recognises the intent of the user when searching up the keyword. Our goal is to optimise the blog post to be highly relevant and valuable to the user, as such the search intent should be satisfied within the blog post. \n\n- Research findings: This is research found from very reputable resources in relation to the blog post. You must intelligently use this research to make your blog post more reputable. \n\n- Preliminary plan: Very basic plan set out by your colleague to kick off the blog post. \n\n- Primary keyword: Out of the keywords, there is one keyword known as the primary keyword. The primary keyword is the keyword which has the highest SEO importance and as such must go in the title and first few sentences of the blog post. It is important that the blog post is highly relevant to the primary keyword, so that it could be placed naturally into the title and introduction sections. \n\n- Faq: Top asked questions by users with answers\n\nGiven the said info, you must create a detailed plan for the blog post. \n \nYour output must: \n\n- Include a plan for the blog post.\n\n- Be in dot point format. \n\n- In each part of the blog post, you must mention which keywords should be placed. \n\nHere are the other things you must consider: \n\n- All keywords must be placed inside the blog post. For each section, mention which keywords to include. The keyword placement must feel natural and must make sense. \n\n- You must include all research points in the blog post. When including the research points, make sure to also include their source URL so that the copywriter can use them as hyperlinks. \n\n- You must ensure that the plan created satisfies the search intent and revolves directly around the given keywords. \n\n- Your plan must be very detailed. \n\n- Keep in mind the copywriter that will use your plan to write the blog post is not an expert in the topic of the blog post. So you should give them all the detail required so they can just turn it into nicely formatted paragraphs. So your plan should include all technical detail regarding each point to be in the blog post. For example instead of saying \"define X\", you must have \"define X as ...\". \n\n- The plan you create must have a flow that makes sense. \n\n- You must ensure the bog post will be highly detailed and satisfy the most important concepts regarding the topic. \n\n- You must ensure the Faq are mentioned without expliciexplicitly mentioning sensitive or public names , make the Faq public like question.\n\nA new project has just came across your desk with below details:\n\nKeywords: \n{{ $('Grab New Cluster').item.json.Keywords }} \n\nSearch intent: \n{{ $('Grab New Cluster').item.json.Intent }}\n\nPreliminary plan: \n{{ $('Preliminary Plan').item.json.message.content }}\n\nResearch findings: \n{{ $json.research }}\n\nPrimary keyword: \n{{ $('Grab New Cluster').item.json['Primary Keyword'] }}\n\nFaq:\n{{ $('Grab New Cluster').item.json.Faq }}\n\nCreate the detailed plan. \n\nYour output must only be the plan and nothing else. \n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1800,
+        160
+      ],
+      "id": "1e854a81-1843-480b-a701-0e5b51eededa",
+      "name": "Create plan",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world class blog posts. \n\nYou are the teams best copywriter and are responsible for writing out the actual blog post. \n\nFor each new blog post project you are provided with a detailed plan and research findings. \n\nYour job is to create the blog post by closely following the detailed plan. \n\nThe blog post you create must: \n\n- Follow the plan bit by bit. \n\n- Use short paragraphs. \n\n- Use bullet points and subheadings with keywords where appropriate.  \n\n- Not have any fluff. The content of the blog must be value dense and direct. \n\n- Be very detailed. \n\n- Include the keywords mentioned in each section within that section. \n\n- Use the research as advised by the plan. Make sure to include the link associated with each point you extract from the research at the end of that section in the form of a URL.  \n\n- Place the primary keyword in the blog title, H1 header and early in the introduction. \n\n- Place one keyword for each section in the heading of that section. \n\n-  When possible pepper synonyms of the keywords throughout each section. \n\n- When possible use Latent Semantic Indexing (LSI) keywords and related terms to enhance context (e.g., “robotic process automation” for RPA). \n\n- Be at minimum 2000 to 2500 words long. \n\n- Be suitable for a year 5 reading level. \n\nMake sure to create the entire blog post draft in your first output. Don't stop or cut it short. \n\nHere are the details of your next blog post project: \n\nDetailed Plan: \n{{ $json.message.content }}\n\nDetailed Research: \n{{ $('Fix Links').item.json.research }}\n\n\nWrite the blog post."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2180,
+        160
+      ],
+      "id": "cdedb4ee-f570-4080-abf6-7c4dc10fd9cf",
+      "name": "Write Blog",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "previous-posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        160
+      ],
+      "id": "fe804a1f-450f-48b4-8b2e-07bfb16c4a0e",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO-0125"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are part of a team that creates world class blog posts. \n\nYou are in charge of internal linking between blog posts. \n\nFor each new blog post that comes across your desk, your job is to look through previously posted blogs and make atleast 5 internal links. \n\nTo choose the best internal linking opportunities you must: \n\n- Read the previous blog post summaries and look through their keywords. If there is a match where the previous blog post is highly relevant, then this is an internal linking opportunity. \n\n- Do not link if it is not highly relevant. Only make a link if it makes sense and adds value for the reader. \n\nOnce you've found the best linking opportunities, you must update the blog post with the internal links. To do this you must: \n\n- Add the link of the previous blog post at the relevant section of the new blog post. Drop the URL at the place which makes most sense. Later we will hyperlink the URL to the word in the blog post which it is placed next to. So your placing is very important. \n\nMake sure to not delete any existing URLs or change anything about the blog post provided to you. You must only add new internal linking URLs and output the revised blog post. \n\nYour output must be the blog post given to you plus the new urls. Don't remove any info. \n\nDon't return the previous blog posts. Only return the current blog post with the internal links added.\n\nCurrent blog Post: \n{{ $('Write Blog').last().json.message.content }}\n\nPrevious Blog Posts: \n{{ $json['previous-posts'].toJsonString().split() }}\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2920,
+        160
+      ],
+      "id": "1ebace85-d328-4fd4-bfab-a6aa5a05cce4",
+      "name": "Add internal links",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO-0125"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a slug for the following blog post: \n{{ $('Add internal links').item.json.message.content }}\n\nA slug in a blog post is the part of the URL that comes after the domain name and identifies a specific page. It is typically a short, descriptive phrase that summarizes the content of the post, making it easier for users and search engines to understand what the page is about. For example, in the URL www.example.com/intelligent-agents, the slug is intelligent-agents. A good slug is concise, contains relevant keywords, and avoids unnecessary words to improve readability and SEO. \n\nThe slug must be 4 or 5 words max and must include the primary keyword of the blog post which is {{ $('Grab New Cluster').last().json['Primary Keyword'] }}.\n\nYour output must be the slug and nothing else so that I can copy and paste your output and put it at the end of my blog post URL to post it right away. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        4960,
+        160
+      ],
+      "id": "f2bf68a1-aff3-4d59-ba17-462126523af9",
+      "name": "Slug",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO-0125"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Extract the blog post title from the following blog post: \n{{ $('Add internal links').item.json.message.content }}\n\n\n\nThe blog post title must include the primary keyword {{ $('Grab New Cluster').last().json['Primary Keyword'] }} and must inform the users right away of what they can expect from reading the blog post. \n\n- Don't put the output in \"\". The output should just text with no markdown or formatting. \n\nYour output must only be the blog post title and nothing else. "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        5380,
+        160
+      ],
+      "id": "d3b5449b-0984-49b7-bed4-e42aa2916e87",
+      "name": "Title",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "GPT-3.5-TURBO-0125"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Create a good meta description for the following blog post: \n\n{{ $('Add internal links').item.json.message.content }}\n\nA good meta description for a blog post that is SEO-optimized should:\n- Be Concise: Stick to 150-160 characters to ensure the full description displays in search results. \n- Include Keywords: Incorporate primary keywords naturally to improve visibility and relevance to search queries.\n\nPrimary keyword = {{ $('Grab New Cluster').last().json['Primary Keyword'] }}\n\nMore keywords to include if possible = [{{ $('Grab New Cluster').last().json.Keywords }}]\n\n- Provide Value: Clearly describe what the reader will learn or gain by clicking the link. \n\n- Be Engaging: Use persuasive language, such as action verbs or a question, to encourage clicks. \n\n- Align with Content: Ensure the description accurately reflects the blog post to meet user expectations and reduce bounce rates. \n\nYour output must only be the meta description and nothing else. \n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        5720,
+        160
+      ],
+      "id": "3fb5b054-e567-4bbb-a53f-e7c11d5d630f",
+      "name": "Meta description",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://serpapi.com/search?engine=google_images",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $('Title').item.json.message.content }}"
+            },
+            {
+              "name": "gl",
+              "value": "us"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6140,
+        160
+      ],
+      "id": "3becf0d1-c981-42ef-8b05-8069e30a0b53",
+      "name": "Image Covers",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "oyTyrbIoegbgAvMF",
+          "name": "Query Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1f0541df-05ab-4e3d-a5d8-3904579fc8a9",
+              "name": "image-url",
+              "value": "={{ $json.images_results[1].original }}",
+              "type": "string"
+            },
+            {
+              "id": "010a7d85-5ed9-43fa-9a03-15d81b631015",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        6320,
+        160
+      ],
+      "id": "9cc9542e-a79f-40b8-aeec-f18222c0d3e5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ToaO3eEW1lJLM5s5deiKKVWrjuHYuunUyji3YQOthIc",
+          "mode": "list",
+          "cachedResultName": "Cluster - Blog Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ToaO3eEW1lJLM5s5deiKKVWrjuHYuunUyji3YQOthIc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1714539459,
+          "mode": "list",
+          "cachedResultName": "Pillar #1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ToaO3eEW1lJLM5s5deiKKVWrjuHYuunUyji3YQOthIc/edit#gid=1714539459"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Primary Keyword": "={{ $('Grab New Cluster').last().json['Primary Keyword'] }}",
+            "Completed": "Yes"
+          },
+          "matchingColumns": [
+            "Primary Keyword"
+          ],
+          "schema": [
+            {
+              "id": "Cluster",
+              "displayName": "Cluster",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Intent",
+              "displayName": "Intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Primary Keyword",
+              "displayName": "Primary Keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Completed",
+              "displayName": "Completed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        6760,
+        160
+      ],
+      "id": "4a2a8f4a-80f6-4014-a5b3-e13faf8a09a0",
+      "name": "Check as completed on Sheets"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VBn94hh0caksH-Yk4h4BFZ80_sJJinIFxyWba9fQ8QQ",
+          "mode": "list",
+          "cachedResultName": "Previous Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBn94hh0caksH-Yk4h4BFZ80_sJJinIFxyWba9fQ8QQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 634298018,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBn94hh0caksH-Yk4h4BFZ80_sJJinIFxyWba9fQ8QQ/edit#gid=634298018"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Keywords": "={{ $('Grab New Cluster').last().json.Keywords }}",
+            "URL": "=https://blogs.vistaratechnologies.in/{{ $('Slug').item.json.message.content }}",
+            "Blog Title": "={{ $('Title').item.json.message.content }}",
+            "Summary": "={{ $('Meta description').item.json.message.content }}",
+            "Post ID": "={{ $('Wordpress').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Blog Title",
+              "displayName": "Blog Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Keywords",
+              "displayName": "Keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        6940,
+        160
+      ],
+      "id": "35038c00-1b6b-46a7-80dc-5e25b7ef3ebe",
+      "name": "Google Sheets"
+    },
+    {
+      "parameters": {
+        "content": "## Schedule a trigger\n \n",
+        "height": 240,
+        "width": 260
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "4da51227-a6cb-49ad-a580-d127feb7ac95",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## New Post Info\n \n",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        700,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "f696cde1-5a9f-435a-a4a8-64e169c01d81",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Preliminary Post Plan \n \n",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        960,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "fa35bea8-9a75-437c-81b2-2afba0ce59e7",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Research\n \n \n",
+        "height": 240,
+        "width": 180
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1320,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "d27de05f-e9c2-42da-8437-6c4b2b673e68",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Post Plan \n \n",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1780,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "8c2fd75d-6d62-4602-9249-106d958a249a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Writing Blog\n \n \n",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2160,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "a82e58e6-488e-41c4-afbf-8c89ea418e82",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Internal Links\n \n \n",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2900,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "d1dad8cc-dc63-45cd-b3ce-ec8a2db35492",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## HTML\n\n \n \n",
+        "height": 300,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4340,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "b4aa4ab2-8cdb-4ca8-831a-9a62104b9aca",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Slug\n\n\n \n \n",
+        "height": 240,
+        "width": 320
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4920,
+        100
+      ],
+      "typeVersion": 1,
+      "id": "190fd5b3-5d35-4dfe-aa67-660f79190169",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Post Title\n\n\n \n \n",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5360,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "11d66f05-6812-48d6-8cc4-47482edb97d7",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Meta Description\n\n\n \n \n",
+        "height": 240,
+        "width": 300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5700,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "17a33ed6-6c1a-4468-a3cd-788f67dfb261",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Get Image\n\n\n\n \n \n",
+        "height": 240,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6080,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "31fff00d-bae1-4692-b42d-cc212e806a63",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Post\n\n\n\n\n \n \n",
+        "height": 240
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6440,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "f2ecea1f-08e4-4f67-a991-d4b55952cf29",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "title": "={{ $('Title').item.json.message.content }}",
+        "additionalFields": {
+          "authorId": "={{ 1 }}",
+          "content": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>{{ $json['title'] || 'Vistara Technologies' }}</title>\n\n  <!-- Load Tailwind CSS -->\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n\n  <style>\n    .container { \n      max-width: 800px; \n      margin: auto; \n      background: white; \n      padding: 24px; \n      border-radius: 8px; \n      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); \n    }\n  </style>\n</head>\n<body class=\"bg-gray-100 p-6\">\n  \n  <!-- Navigation -->\n  <header class=\"bg-blue-600 text-white py-4 text-center text-xl font-bold\">\n    {{ $json['site_name'] || 'Vistara Technologies' }}\n  </header>\n\n  <div class=\"container my-8 p-6 bg-white rounded-lg shadow-lg\">\n    \n    <!-- Title -->\n    <h1 class=\"text-3xl font-bold text-gray-800\">{{ $('HTML version').item.json.message.content.title }}</h1>\n\n    <!-- Featured Image -->\n    <img src=\"{{ $json['image-url'] || 'default-image.jpg' }}\" \n         alt=\"{{ $json['title'] || 'Cover Image' }}\" \n         class=\"w-full mt-4 rounded-lg shadow-sm\">\n\n    <!-- Content Section -->\n    <div class=\"mt-6 text-gray-700\">\n       {{ $('HTML version').item.json.message.content.html }}\n    </div>\n\n    <!-- WPForms Contact Form (WordPress Integration Required) -->\n    <div class=\"mt-8 bg-gray-100 p-4 rounded-lg\">\n      <h2 class=\"text-xl font-semibold text-gray-800\">Get in Touch</h2>\n      <div id=\"wp-form-container\"></div>\n      <script>\n        document.getElementById('wp-form-container').innerHTML = `[wpforms id=\"26\" title=\"false\"]`;\n      </script>\n    </div>\n  </div>\n  \n  <!-- Footer -->\n  <footer class=\"text-center text-gray-600 py-4\">\n    &copy;{{ new Date().getFullYear() }} - {{ $json['site_name'] || 'Vistara Technologies' }}. All rights reserved.\n  </footer>\n\n</body>\n</html>\n",
+          "slug": "={{ $('Slug').item.json.message.content }}",
+          "status": "private",
+          "commentStatus": "closed",
+          "sticky": false,
+          "categories": [
+            1
+          ],
+          "tags": [],
+          "postTemplate": {
+            "values": {
+              "elementor": false
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.wordpress",
+      "typeVersion": 1,
+      "position": [
+        6540,
+        160
+      ],
+      "id": "19717d29-4c21-4962-bd00-14eb85fe303f",
+      "name": "Wordpress",
+      "credentials": {
+        "wordpressApi": {
+          "id": "Y775jxg23xPoZ4LX",
+          "name": "Wordpress account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Completion\n\n\n\n\n\n \n \n",
+        "height": 240,
+        "width": 480
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        6680,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "2f3ab3f1-c429-4db7-a91f-0ed410c84fae",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "# WORDPRESS & SOCIAL MEDIA\n # SEO POST\n\n \n \n",
+        "height": 180,
+        "width": 580,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        460,
+        -180
+      ],
+      "typeVersion": 1,
+      "id": "73231115-c41a-46b2-aae3-45e2b49d1b32",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"sonar-pro\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Act as a professional news researcher who is capable of finding detailed summaries about a news topic from highly reputable sources.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"{{ $json.message.content.split(/\\n+/).join(' ').replaceAll('\"', ' ') }}\"\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1360,
+        160
+      ],
+      "id": "a5e501dd-504c-481d-83f3-1deec44a9307",
+      "name": "Research",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "fFVLleBld5dMTqJL",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1VBn94hh0caksH-Yk4h4BFZ80_sJJinIFxyWba9fQ8QQ",
+          "mode": "list",
+          "cachedResultName": "Previous Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBn94hh0caksH-Yk4h4BFZ80_sJJinIFxyWba9fQ8QQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 634298018,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VBn94hh0caksH-Yk4h4BFZ80_sJJinIFxyWba9fQ8QQ/edit#gid=634298018"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2540,
+        160
+      ],
+      "id": "dd73536c-6ca4-4217-a339-2de0ca66c9f0",
+      "name": "Previous Posts",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hWyck1syXZrHxgFK",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n<head>\n  <meta charset=\"UTF-8\" />\n    <script src=\"https://cdn.tailwindcss.com\"></script>\n  <title>{{ $json.message.content.title }}</title>\n</head>\n<body>\n{{ $json.message.content.html }}\n</body>\n</html>"
+      },
+      "id": "07eb0bd0-fcfa-48c2-8df4-ff18639dfb95",
+      "name": "Format the HTML result",
+      "type": "n8n-nodes-base.html",
+      "position": [
+        4680,
+        160
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You convert a JSON to HTML. \nThe JSON output has the following fields:\n- html: the page HTML\n- title: the page title",
+              "role": "system"
+            },
+            {
+              "content": "={{ $json.message.content.html }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.2
+        }
+      },
+      "id": "918df7e9-5a77-4787-a5eb-8d569aed2f12",
+      "name": "HTML version",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        4360,
+        160
+      ],
+      "typeVersion": 1.3,
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Education",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "231306eb-9c99-4d01-8c4c-aef9d598addb"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0d9e7f11-b6b8-46a7-82ac-78765531c6a4",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Service",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "82609943-ffa8-4eed-a218-8c3c45ac9152",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "da99ef04-c989-457a-91e5-8d477ddba39e",
+                    "leftValue": "={{ $json.message.content }}",
+                    "rightValue": "Product",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        3660,
+        140
+      ],
+      "id": "dd9fd8ff-9f81-4a0d-9f34-f1588f26404f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=content:{{ $json.message.content }}\n\nAnalyze the following content and categorize it into one of these four types:\n\nProduct Showcase → If it describes product features, specifications, and pricing.\n\nService Description → If it explains a service offering, process, or consultation.\n\nLead Generation → If the goal is to capture user details (e.g., sign up, free trial, booking).\n\nEducational Resource → If the focus is on providing knowledge, guides, or tutorials.\n\nReturn only the category name as a single word (Product, Service, Lead, or Education).\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3340,
+        160
+      ],
+      "id": "084b98ab-3003-4174-968c-e12832c7aea2",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=> **Role:**  \n> You are an expert **UI/UX designer** and **high-converting copywriter** specializing in **SEO-optimized educational landing pages**. Your job is to generate a **professional, engaging, and conversion-friendly** landing page using **Tailwind CSS** based on the provided content.  \n>   \n> Your output should be structured, visually appealing, and optimized for **readability, engagement, and lead generation**.  \n\n---\n\n### **Content Input:**  \n```\n{{ $('Add internal links').item.json.message.content }}\n```  \n\n---\n\n## **Landing Page Structure (Conversion-Optimized)**  \n\n### **1. Header Section (Navigation & Branding)**  \n- **Logo**: Display the company logo using the following image:\n  ```html\n  <img src=\"https://www.vistaratechnologies.in/wp-content/uploads/2025/03/1-2-1024x291.png\" alt=\"Vistara Technologies Logo\" class=\"h-10 w-auto\">\n  ```  \n- Clean, **minimal UI for distraction-free reading**  \n\n---\n\n### **2. Hero Section (First Fold) – Strong Hook**  \n- **Engaging headline** that clearly introduces the educational topic  \n- **Concise, compelling subtext** emphasizing the core learning outcome  \n- **Visually appealing CTA button** (if applicable, e.g., “Start Learning,” “Download Guide”)  \n- Background **image, icon, or illustration** to enhance appeal  \n\n---\n\n### **3. Educational Content Section (Structured for Clarity & Engagement)**  \n- **Clear subheadings & logical content flow** for better readability  \n- Use **bullet points, numbered lists, and short paragraphs** to improve skimming  \n- **Real-life examples, case studies, or statistics** to add credibility  \n- **Engaging visuals, infographics, or illustrations** for visual appeal  \n- **Key takeaways or summary box** at the end for retention  \n\n---\n\n### **4. Additional Learning Resources (Optional but Recommended)**  \n- Links to **related blog posts, guides, research papers, or courses**  \n- **Downloadable PDFs, checklists, or toolkits** (if applicable)  \n- **Embedded video or tutorial content** for enhanced engagement  \n\n---\n\n### **5. FAQ Section (Boosts Engagement & SEO)**  \n- AI extracts **4-5 of the most relevant questions** related to the topic  \n- Answers should be **concise, benefit-driven, and conversational**  \n\n---\n\n### **6. Call-to-Action (Optional but Powerful for Lead Capture)**  \n- If the content is **actionable**, include a **CTA button** (e.g., “Sign Up for Free,” “Download the Guide”)  \n- **Trust signals** (e.g., \"Join 50,000+ learners,\" \"No spam, unsubscribe anytime\")  \n\n---\n\n### **7. Footer – Professional & SEO-Optimized**  \n- **Copyright notice**  \n- **Quick links** (Privacy Policy, Terms & Conditions, Contact)  \n- **Social media icons for easy sharing**  \n- Clean, minimal **SEO-optimized footer layout**  \n\n---\n\n## **Tailwind CSS Styling Requirements:**  \n✅ **Fully mobile-responsive** (Optimized for all devices)  \n✅ **Consistent spacing, typography, and readability**  \n✅ **Modern, clean UI with subtle animations**  \n✅ **Dark/light mode support (optional but recommended)**  \n✅ **Clear, high-contrast CTA buttons for better engagement**  \n\n---\n\n## **Output Format**  \n```json\n{\n  \"templateType\": \"educational-resource\",\n  \"title\": \"SEO-optimized, keyword-rich title\",\n  \"html\": \"Complete, structured, and mobile-optimized HTML markup for the landing page\"\n}\n```\n\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3920,
+        -180
+      ],
+      "id": "737c081c-db45-4a67-86a5-b4e5c22e936b",
+      "name": "Education",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=> **Role:**  \n> You are an expert **UI/UX designer** and **high-converting copywriter** specializing in **SEO-optimized service landing pages**. Your task is to generate a **professional, engaging, and conversion-focused** landing page using **Tailwind CSS** based on the provided content.  \n>   \n> Your output should be **highly persuasive**, designed to **build trust, highlight benefits, and drive inquiries or bookings**.  \n\n---\n\n### **Content Input:**  \n```  \n{{ $('Add internal links').item.json.message.content }}  \n```  \n\n---\n\n## **Landing Page Structure (Conversion-Optimized)**  \n\n### **1. Header Section (Navigation & Branding)**  \n-  **Logo**: Display the company logo using the following image:\n  ```html\n  <img src=\"https://www.vistaratechnologies.in/wp-content/uploads/2025/03/1-2-1024x291.png\" alt=\"Vistara Technologies Logo\" class=\"h-10 w-auto\">\n  ``` \n- Clean, minimal UI for **distraction-free browsing**  \n\n---\n\n### **2. Hero Section (First Fold) – Strong Hook**  \n- **Powerful, benefit-driven headline**  \n- **Supporting subtext** highlighting key benefits & pain points solved  \n- **Visually appealing CTA button** (e.g., “Get a Free Quote,” “Book a Consultation”)  \n- Background image, icon, or **customer success visual**  \n\n---\n\n### **3. Service Overview (Clear Value Proposition)**  \n- **What the service is & who it’s for**  \n- **Key features/benefits in bullet points**  \n- **Social proof or trust badges** (if applicable)  \n\n---\n\n### **4. Detailed Service Breakdown (Trust-Building & Clarity)**  \n- **How the service works (step-by-step if needed)**  \n- **Unique selling points (What makes this service stand out?)**  \n- **Pricing (if applicable) or clear CTA to get a quote**  \n\n---\n\n### **5. Testimonials & Social Proof (Boost Trust & Conversions)**  \n- **Real customer reviews** (if available)  \n- **Case studies or success stories**  \n- **Logos of past clients (if applicable)**  \n\n---\n\n### **6. Call-to-Action (Clear, Persuasive, and Urgent)**  \n- **Primary CTA button** (e.g., “Book a Free Consultation,” “Request a Demo”)  \n- **Secondary CTA (if needed, e.g., “Learn More”)**  \n- **Urgency triggers** (Limited slots, “Offer ends soon,” etc.)  \n\n---\n\n### **7. FAQ Section (Boosts Engagement & SEO)**  \n- AI extracts **4-5 of the most relevant user questions**  \n- Answers should be **clear, concise, and benefit-driven**  \n\n---\n\n### **8. Footer – Professional & SEO-Optimized**  \n- **Copyright notice**  \n- **Quick links (Privacy Policy, Terms & Conditions, Contact Info)**  \n- **Social media icons for credibility**  \n- **SEO-optimized structured footer**  \n\n---\n\n## **Tailwind CSS Styling Requirements:**  \n✅ **Fully mobile-responsive**  \n✅ **Consistent spacing, typography, and readability**  \n✅ **Modern, clean UI with subtle animations**  \n✅ **High-contrast CTA buttons for strong conversions**  \n\n---\n\n## **Output Format**  \n{  \n  \"templateType\": \"service-description\",  \n  \"title\": \"SEO-optimized, conversion-driven title\",  \n  \"html\": \"Complete, structured, and mobile-optimized HTML markup for the service landing page\"  \n}  \n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3920,
+        40
+      ],
+      "id": "11a2bf98-f06c-432a-8310-585cc583446b",
+      "name": "Service",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=> **Role:**  \n> You are an expert **UI/UX designer** and **high-converting copywriter** specializing in **SEO-optimized lead generation landing pages**. Your job is to generate a **highly persuasive, professional, and conversion-focused** landing page using **Tailwind CSS** based on the provided content.  \n>   \n> Your output should be structured to maximize **lead capture, engagement, and trust-building** while maintaining a clean and visually appealing layout.  \n\n---\n\n### **Content Input:**  \n```  \n{{ $('Add internal links').item.json.message.content }}  \n```  \n\n---\n\n## **Landing Page Structure (Conversion-Optimized)**  \n\n### **1. Header Section (Navigation & Branding)**  \n- **Logo**: Display the company logo using the following image:\n  ```html\n  <img src=\"https://www.vistaratechnologies.in/wp-content/uploads/2025/03/1-2-1024x291.png\" alt=\"Vistara Technologies Logo\" class=\"h-10 w-auto\">\n  ```  \n- Optional **“Sign In” or “Get Started” button** for returning users  \n\n---\n\n### **2. Hero Section (Strong Hook & Value Proposition)**  \n- **Powerful, benefit-driven headline** to capture attention  \n- **Concise subtext** reinforcing the key value proposition  \n- **High-contrast lead capture form** (Name, Email, Phone, etc.)  \n- **Strong CTA button** (e.g., “Get Free Access,” “Claim Your Offer”)  \n- **Trust badges or social proof** (e.g., “100,000+ happy users”)  \n\n---\n\n### **3. Key Benefits & Features**  \n- **Three-column layout** showcasing the main benefits  \n- **Icons + short descriptions** for readability  \n- Focus on **how the service/product solves user pain points**  \n\n---\n\n### **4. Lead Magnet (Incentive for Sign-Up)**  \n- Highlight **exclusive benefits** (e.g., “Free Trial,” “Bonus Guide”)  \n- Use **FOMO triggers** (Limited-time offer, “Only X spots left”)  \n- **Short bullet points** on what the user will gain  \n\n---\n\n### **5. Social Proof & Testimonials**  \n- **Real customer reviews, case studies, or video testimonials**  \n- **Logos of featured publications or partners** (if available)  \n- Trust signals such as **star ratings or success metrics**  \n\n---\n\n### **6. Call-to-Action (Reinforced for Conversions)**  \n- **Bold CTA with clear instructions** (e.g., “Sign Up Now”)  \n- **Urgency & scarcity elements** to encourage action  \n- **No-risk assurance** (e.g., “No credit card required”)  \n\n---\n\n### **7. FAQ Section (Reduces Hesitations & Boosts Trust)**  \n- AI extracts **4-5 most relevant questions** about the offer  \n- Answers should be **concise, benefit-driven, and persuasive**  \n\n---\n\n### **8. Footer – Professional & SEO-Optimized**  \n- **Copyright notice**  \n- **Quick links** (Privacy Policy, Terms & Conditions, Contact)  \n- **Social media icons** (if applicable)  \n- **SEO-friendly minimal footer layout**  \n\n---\n\n## **Tailwind CSS Styling Requirements:**  \n✅ **Fully mobile-responsive**  \n✅ **Consistent spacing, typography, and readability**  \n✅ **Modern, clean UI with subtle animations**  \n✅ **Dark/light mode support (optional but recommended)**  \n✅ **High-contrast CTA buttons for better engagement**  \n\n---\n\n## **Output Format**  \n{  \n  \"templateType\": \"lead-generation\",  \n  \"title\": \"SEO-optimized, high-converting title\",  \n  \"html\": \"Complete, structured, and mobile-optimized HTML markup for the landing page\"  \n}  \n"
+            }
+          ]
+        },
+        "simplify": "={{ true }}",
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3920,
+        260
+      ],
+      "id": "48d56daf-3a27-4e21-b8c6-58b66e69624f",
+      "name": "Lead",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=> **Role:**  \n> You are an expert **UI/UX designer** and **high-converting copywriter** specializing in **SEO-optimized product landing pages**. Your job is to generate a **professional, engaging, and conversion-focused** landing page using **Tailwind CSS** based on the provided content.  \n>   \n> Your output should be structured, visually appealing, and optimized for **readability, engagement, and lead generation**.  \n\n---\n\n### **Content Input:**  \n```  \n{{ $('Add internal links').item.json.message.content }}  \n```  \n\n---\n\n## **Landing Page Structure (Conversion-Optimized)**  \n\n### **1. Header Section (Navigation & Branding)**  \n-  **Logo**: Display the company logo using the following image:\n  ```html\n  <img src=\"https://www.vistaratechnologies.in/wp-content/uploads/2025/03/1-2-1024x291.png\" alt=\"Vistara Technologies Logo\" class=\"h-10 w-auto\">\n  ```  \n- Clean, **minimal UI for distraction-free browsing**  \n\n---\n\n### **2. Hero Section (First Fold) – Strong Hook**  \n- **Powerful, engaging headline** that clearly communicates the product’s core value proposition  \n- **Concise, compelling subtext** highlighting the main benefits  \n- **Visually appealing CTA button** (e.g., “Buy Now,” “Get Started,” “Try for Free”)  \n- Background **image, icon, or product showcase illustration** to enhance appeal  \n\n---\n\n### **3. Product Features & Benefits**  \n- **Three-column layout** showcasing key product features  \n- Use **icons + short descriptions** for easy skimming  \n- **Focus on user pain points & solutions**  \n- Include a **feature comparison table (if applicable)**  \n\n---\n\n### **4. Social Proof & Testimonials**  \n- **User testimonials or case studies** for credibility  \n- **Logos of trusted brands or media mentions** (if applicable)  \n- **Star ratings and real customer reviews**  \n\n---\n\n### **5. Pricing Section (If applicable)**  \n- Clear, **easy-to-read pricing table** with feature breakdowns  \n- Highlight **best-value plan with subtle UI emphasis**  \n- Include **money-back guarantee or risk-free trial statement**  \n\n---\n\n### **6. Call-to-Action (CTA) – Strong Persuasion**  \n- A **clear, high-contrast CTA button**  \n- **Urgency triggers** (Limited-time offer, “Only X spots left,” etc.)  \n- **Trust signals** (Secure Payment, Money-back Guarantee, etc.)  \n\n---\n\n### **7. FAQ Section (Boosts Engagement & SEO)**  \n- AI extracts **4-5 most relevant questions** potential customers might ask  \n- Answers should be **concise, benefit-driven, and conversational**  \n\n---\n\n### **8. Footer – Professional & SEO-Optimized**  \n- **Copyright notice**  \n- **Quick links** (Privacy Policy, Terms & Conditions, Support)  \n- **Social media icons for easy sharing**  \n- Clean, minimal **SEO-optimized footer layout**  \n\n---\n\n## **Tailwind CSS Styling Requirements:**  \n✅ **Fully mobile-responsive** (Optimized for all devices)  \n✅ **Consistent spacing, typography, and readability**  \n✅ **Modern, clean UI with subtle animations**  \n✅ **Dark/light mode support (optional but recommended)**  \n✅ **Clear, high-contrast CTA buttons for better engagement**  \n\n---\n\n## **Output Format**  \n{  \n  \"templateType\": \"product-showcase\",  \n  \"title\": \"SEO-optimized, keyword-rich title\",  \n  \"html\": \"Complete, structured, and mobile-optimized HTML markup for the landing page\"  \n}  \n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        3920,
+        500
+      ],
+      "id": "efbf679c-2da7-4c9c-bd95-4768bafdf692",
+      "name": "Product",
+      "credentials": {
+        "openAiApi": {
+          "id": "FPpfkYpnMm9mMA6w",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Template Choice",
+        "height": 980,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3860,
+        -280
+      ],
+      "id": "9da5baa6-1519-4cfc-9d31-6fe65ca5c278",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Template Selection\n",
+        "height": 280,
+        "width": 500
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3300,
+        80
+      ],
+      "id": "598e68b0-2fc3-4528-a7d3-6d0a16445dd5",
+      "name": "Sticky Note16"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Grab New Cluster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grab New Cluster": {
+      "main": [
+        [
+          {
+            "node": "Preliminary Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preliminary Plan": {
+      "main": [
+        [
+          {
+            "node": "Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fix Links": {
+      "main": [
+        [
+          {
+            "node": "Create plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create plan": {
+      "main": [
+        [
+          {
+            "node": "Write Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Blog": {
+      "main": [
+        [
+          {
+            "node": "Previous Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Add internal links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add internal links": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slug": {
+      "main": [
+        [
+          {
+            "node": "Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Title": {
+      "main": [
+        [
+          {
+            "node": "Meta description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Meta description": {
+      "main": [
+        [
+          {
+            "node": "Image Covers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Covers": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Wordpress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check as completed on Sheets": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wordpress": {
+      "main": [
+        [
+          {
+            "node": "Check as completed on Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research": {
+      "main": [
+        [
+          {
+            "node": "Fix Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Previous Posts": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format the HTML result": {
+      "main": [
+        [
+          {
+            "node": "Slug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML version": {
+      "main": [
+        [
+          {
+            "node": "Format the HTML result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Education",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Service",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Education": {
+      "main": [
+        [
+          {
+            "node": "HTML version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Service": {
+      "main": [
+        [
+          {
+            "node": "HTML version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead": {
+      "main": [
+        [
+          {
+            "node": "HTML version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product": {
+      "main": [
+        [
+          {
+            "node": "HTML version",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "769e7027-13f3-47bc-ada9-4912db0fef04",
+  "meta": {
+    "instanceId": "bea112a26e350c86dab950bf46a674ed01e07672f97c6ee6c524c1aa1b48d82e"
+  },
+  "id": "gSBSqXMz4MRqD87p",
+  "tags": [
+    {
+      "createdAt": "2025-03-26T18:55:18.555Z",
+      "updatedAt": "2025-03-26T18:55:18.555Z",
+      "id": "dsn8WNtT3PkGszIs",
+      "name": "marketing-automation"
+    }
+  ]
+}
